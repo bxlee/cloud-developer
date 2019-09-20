@@ -38,13 +38,13 @@ import { filterImageFromURL, deleteLocalFiles } from './util/util';
   });
 
   interface IFilteredImageRequest extends express.Request {
-    params: {
+    query: {
       image_url: string;
     };
   }
 
   app.get("/filteredimage", async (req: IFilteredImageRequest, res, next) => {
-    const { image_url } = req.params;
+    const { image_url } = req.query;
     if (!image_url) {
       return res.status(422).send("Bad request - missing required parameters");
     }
