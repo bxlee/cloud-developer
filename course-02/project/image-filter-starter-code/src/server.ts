@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import { filterImageFromURL, deleteLocalFiles } from './util/util';
 
 (async () => {
 
@@ -33,14 +33,41 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
+  app.get("/", async (req, res) => {
     res.send("try GET /filteredimage?image_url={{}}")
-  } );
-  
+  });
+
+  interface IFilteredImageRequest extends express.Request {
+    query: {
+      image_url: string;
+    };
+  }
+
+  app.get("/filteredimage", async (req: IFilteredImageRequest, res, next) => {
+    const { image_url } = req.query;
+    if (!image_url) {
+      return res.status(422).send("Bad request - missing required parameters");
+    }
+
+    let filteredImageFilePath: string;
+    try {
+      filteredImageFilePath = await filterImageFromURL(image_url);
+    } catch (err) {
+      return next(err);
+    }
+
+    res.sendFile(filteredImageFilePath, (err) => {
+      if (err) {
+        return next(err);
+      }
+
+      deleteLocalFiles([filteredImageFilePath]);
+    });
+  });
 
   // Start the Server
-  app.listen( port, () => {
-      console.log( `server running http://localhost:${ port }` );
-      console.log( `press CTRL+C to stop server` );
-  } );
+  app.listen(port, () => {
+    console.log(`server running http://localhost:${ port }`);
+    console.log(`press CTRL+C to stop server`);
+  });
 })();
