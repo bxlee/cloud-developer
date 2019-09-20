@@ -1,5 +1,7 @@
 # Udagram Image Filtering Microservice
 
+**Endpoint**: udagram-image-filtering-bxlee-dev.us-west-1.elasticbeanstalk.com
+
 ## Tasks
 
 ### Setup Node Environment
